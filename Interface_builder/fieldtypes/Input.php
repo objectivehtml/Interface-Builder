@@ -20,6 +20,6 @@ class Input_IBField extends IBFieldtype {
 			$input_type = 'text';
 		}
 
-		return '<input type="'.$input_type.'" name="'.$this->name.'" value="'.$data.'" id="'.$this->id.'" />';
+		return '<input type="'.$input_type.'" name="'.$this->name.'" value="'.$this->form_prep($data).'" id="'.$this->id.'" />';
 	}
 }

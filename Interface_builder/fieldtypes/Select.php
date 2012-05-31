@@ -6,18 +6,79 @@ class Select_IBField extends IBFieldtype {
 	{
 		$html = array();
 
-		$html[] = '
-		<select name="'.$this->name.'" id="'.$this->id.'">';
+		if($this->settings['options'] == 'CHANNEL_DROPDOWN')
+		{
+			$channels = array('' => '--');
+
+			foreach($this->channel_data->get_channels(array(
+				'order_by' => 'channel_name',
+				'sort' => 'asc'
+			))->result() as $index => $row)
+			{
+				$channels[$row->channel_id] = $row;
+			}
+
+			$this->settings['options'] = $this->build_options($channels, 'channel_id', 'channel_title');
+		}
+
+		if($this->settings['options'] == 'FIELD_DROPDOWN')
+		{
+			$fields = array('' => '--', 'title' => 'Title');
+
+			foreach($this->channel_data->get_fields(array(
+				'order_by' => 'group_id, field_name',
+				'sort'     => 'asc, asc'
+			))->result() as $row)
+			{
+				$fields[$row->field_id] = $row;
+			}
+
+			$this->settings['options'] = $this->build_options($fields, 'field_id', 'field_label');
+
+		}
+
+		$html[] = '<select name="'.$this->name.'" id="'.$this->id.'">';
 
 		foreach($this->settings['options'] as $option_value => $option_name)
 		{
-			$selected = $data == $option_value ? 'selected="selected"' : NULL;
-			$html[]   = '<option value="'.$option_value.'" '.$selected.'>'.$option_name.'</option>';
+			$html[]   = '<option value="'.$option_value.'" '.((string) $data == (string) $option_value ? 'selected="selected"' : NULL).'>'.$option_name.'</option>';
 		}
 
 		$html[] = '</select>';
 
 		return implode(NULL, $html);
+	}
+
+	private function build_options($options, $index_field, $value_field)
+	{
+		$dropdown = array();
+
+		foreach($options as $index => $option_value)
+		{
+			if(is_object($option_value))
+			{
+				$option = $option_value;
+			}
+			else
+			{
+				$options = (object) array();
+			}
+
+			if(!isset($option->$index_field))
+			{
+				$option->$index_field = $index;
+			}
+
+			if(!isset($option->$value_field))
+			{
+				$option->$value_field = $option_value;
+			}
+
+
+			$dropdown[$option->$index_field] = $option->$value_field;
+		}
+
+		return $dropdown;
 	}
 
 }
