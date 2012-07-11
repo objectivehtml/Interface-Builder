@@ -10,12 +10,15 @@ class Matrix_IBField extends IBFieldtype {
 
 		$attribute_array = array();
 
-		foreach($this->settings['attributes'] as $name => $value)
+		if(isset($this->settings['attributes']))
 		{
-			$attribute_array[] = $name.'="'.$value.'"';
+			foreach($this->settings['attributes'] as $name => $value)
+			{
+				$attribute_array[] = $name.'="'.$value.'"';
+			}
 		}
 
-		$html[] = '<div id="ib-matrix-'.$this->name.'">';
+		$html[] = '<div id="ib-matrix-'.$this->name.'" data-name="'.$this->name.'" class="ib-matrix">';
 		$html[] = '<table '.implode(NULL, $attribute_array).' class="ib-field-matrix">';
 		$html[] = '<thead><tr><th style="width:1px"></th>';
 
@@ -23,6 +26,8 @@ class Matrix_IBField extends IBFieldtype {
 		{
 			if(is_array($column))
 			{
+				$name = $column['name'];
+				
 				if(isset($column['title']))
 				{
 					$column = $column['title'];
@@ -32,10 +37,11 @@ class Matrix_IBField extends IBFieldtype {
 					$column = $column['name'];
 				}
 			}
-
-			$html[] = '<th>'.$column.'</th>';
+			
+			$html[] = '<th data-column-name="'.$name.'">'.$column.'</th>';
 		}
 
+		$html[] = '<th style="width:40px"></th>';	
 		$html[] = '</tr>';
 		$html[] = '</thead>';
 		$html[] = '<tbody>';
@@ -48,48 +54,21 @@ class Matrix_IBField extends IBFieldtype {
 
 				foreach($this->settings['columns'] as $column)
 				{
-					$html[] = '<td><input type="text" name="'.$this->name.'['.($index-1).']['.$column['name'].']" value="'.(isset($data[$index][$column['name']]) ? $data[$index][$column['name']] : NULL).'" /></td>';
+					$data[$index] = (array) $data[$index];
+
+					$html[] = '<td><input type="text" name="'.$this->name.'['.$index.']['.$column['name'].']" value="'.(isset($data[$index][$column['name']]) ? $data[$index][$column['name']] : NULL).'" class="ib-cell" /></td>';
 				}
 				
+				$html[] = '<td><a href="#'.$index.'" class="ib-delete-row">Delete</a></td>';
 				$html[] = '</tr>';
 			}
 		}
 		
 		$html[] = '</tbody>';
 		$html[] = '</table>
-
-		<a href="#" class="add-row">Add Row</a>
-
-		</div>
-
-		<script type="text/javascript">
-		$(document).ready(function() {
-			var id = "#ib-matrix-'.$this->name.'";
-			var $wrapper = $(id);
-			var $body = $wrapper.find("tbody");
-			var $head = $wrapper.find("thead tr");
-			var columns = '.json_encode($this->settings['columns']).'
-
-			$wrapper.find(".add-row").click(function() {
-				
-				var row = $("<tr />");
-				var index = $body.find("tr").length;
-
-				row.append("<td><div class=\"ib-drag-handle\"></div></td>");
-
-				for(var x = 1; x < $head.find("th").length; x++) {
-					row.append("<td><input type=\"text\" name=\"'.$this->name.'["+index+"]["+columns[x-1].name+"]\" value=\"\" /></td>");
-				}
-
-				$body.append(row);
-
-				return false;
-			});
-		});
-		</script>
-
-		';
-
+			<a href="#" class="ib-add-row">Add Row</a>
+		</div>';
+		
 		return implode(NULL, $html);
 	}
 }

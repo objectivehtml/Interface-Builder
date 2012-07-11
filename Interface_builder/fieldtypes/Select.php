@@ -6,6 +6,21 @@ class Select_IBField extends IBFieldtype {
 	{
 		$html = array();
 
+		if($this->settings['options'] == 'CATEGORY_GROUPS_DROPDOWN')
+		{
+			$channels = array('' => '--');
+
+			foreach($this->channel_data->get_category_groups(array(
+				'order_by' => 'group_id',
+				'sort' => 'asc'
+			))->result() as $index => $row)
+			{
+				$channels[$row->group_id] = $row;
+			}
+
+			$this->settings['options'] = $this->build_options($channels, 'group_id', 'group_name');
+		}
+
 		if($this->settings['options'] == 'CHANNEL_DROPDOWN')
 		{
 			$channels = array('' => '--');
@@ -57,25 +72,24 @@ class Select_IBField extends IBFieldtype {
 		{
 			if(is_object($option_value))
 			{
-				$option = $option_value;
+				$option = (array) $option_value;
 			}
 			else
 			{
-				$options = (object) array();
+				$option = array();
 			}
-
-			if(!isset($option->$index_field))
+			
+			if(!isset($option[$index_field]))
 			{
-				$option->$index_field = $index;
+				$option[$index_field] = $index;
 			}
 
-			if(!isset($option->$value_field))
+			if(!isset($option[$value_field]))
 			{
-				$option->$value_field = $option_value;
+				$option[$value_field] = $option_value;
 			}
 
-
-			$dropdown[$option->$index_field] = $option->$value_field;
+			$dropdown[$option[$index_field]] = $option[$value_field];
 		}
 
 		return $dropdown;

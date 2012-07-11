@@ -1,5 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+
 class Interface_Builder {
 	
 	private $fields = array();
@@ -106,10 +107,9 @@ class Interface_Builder {
 
 		foreach($fields as $field_name => $field)
 		{
-
 			$data     = isset($this->data[$field_name]) ? $this->data[$field_name] : NULL;
 
-			$obj      = $this->load($field_name, $field);
+			$obj      = $this->load($field_name, $this->convert_array($field));
 
 			$return[$field_name] = (object) array(
 				'label'       => $obj->display_label($data),
@@ -132,6 +132,8 @@ class Interface_Builder {
 
 	public function add_fieldset($id, $fieldset)
 	{
+		$fieldset = $this->convert_array($fieldset);
+
 		$count = count($this->fields) + 1;
 
 		$default = array(
@@ -168,6 +170,8 @@ class Interface_Builder {
 
 	public function add_field($fieldset, $name, $field = array())
 	{
+		$field = $this->convert_array($field);
+
 		$count = count($this->fields) + 1;
 
 		$default = array(
@@ -212,17 +216,29 @@ class Interface_Builder {
 		$this->fields = array();
 	}
 
+	public function convert_array($array)
+	{
+		if(is_array($array))
+		{
+			$array = (object) $array;
+		}
+
+		return $array;
+	}
+
 	private function set_default_values($array, $default = array())
 	{
+		$array = $this->convert_array($array);
+
 		foreach($default as $index => $value)
 		{
-			if(!isset($array[$index]))
+			if(!isset($array->$index))
 			{
-				$array[$index] = $value;
+				$array->$index = $value;
 			}
 		}
 
-		return (object) $array;
+		return $array;
 	}
 
 }
