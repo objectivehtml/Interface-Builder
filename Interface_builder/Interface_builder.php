@@ -80,7 +80,7 @@ if(!class_exists('Interface_Builder'))
 			return implode(NULl, $html);
 		}
 	
-		public function table($fields, $data = FALSE, $attributes = array())
+		public function table($fields, $data = FALSE, $attributes = array(), $debug = FALSE)
 		{
 			$html   = array();
 	
@@ -89,8 +89,9 @@ if(!class_exists('Interface_Builder'))
 				$this->data = $data;
 			}
 			
-			$fields = $this->build($fields, $data);
+			$fields = $this->build($fields, $data, $debug);
 	
+		
 			$attribute_array = array();
 	
 			foreach($attributes as $name => $value)
@@ -111,7 +112,7 @@ if(!class_exists('Interface_Builder'))
 			return implode(NULL, $html);
 		}
 	
-		public function build($fields, $data = FALSE)
+		public function build($fields, $data = FALSE, $debug = FALSE)
 		{
 			$return = array();
 			
@@ -120,8 +121,8 @@ if(!class_exists('Interface_Builder'))
 			foreach($fields as $field_name => $field)
 			{
 				$data = isset($this->data->$field_name) ? $this->data->$field_name : NULL;
-				$obj  = $this->load($field_name, $this->convert_array($field));
-								
+				$obj  = $this->load($field_name, $this->convert_array($field), $debug);
+						
 				$return[$field_name] = (object) array(
 					'label'       => $obj->display_label($data),
 					'description' => $obj->display_description($data),
@@ -132,7 +133,7 @@ if(!class_exists('Interface_Builder'))
 			return $return;
 		}
 	
-		public function load($name, $field)
+		public function load($name, $field, $debug = FALSE)
 		{
 			if(!isset($field->type))
 			{
@@ -152,27 +153,14 @@ if(!class_exists('Interface_Builder'))
 				'use_array' => $this->use_array,
 			));
 			
+			$obj = $this->set_default_values($obj, $field);
+			
 			return $obj;
 		}
 	
 		public function add_fieldset($id, $fieldset)
 		{
 			$fieldset = $this->convert_array($fieldset);
-	
-			$count = count($this->fields) + 1;
-	
-			$default = array(
-				'title'       => NULL,
-				'id'          => 'fieldset_'.$count,
-				'legend' 	  => NULL,
-				'description' => NULL,
-				'details'     => NULL,
-				'fields'      => array(),
-				'attributes'  => array(),
-				'wrapper'	  => 'fieldset'
-			);
-	
-			$this->fields[$id] = $this->set_default_values($fieldset, $default);
 	
 			$this->add_fields($id, $this->fields[$id]->fields);
 		}
@@ -197,18 +185,7 @@ if(!class_exists('Interface_Builder'))
 		{
 			$field = $this->convert_array($field);
 	
-			$count = count($this->fields) + 1;
-	
-			$default = array(
-				'label'       => 'Field '.$count,
-				'id'          => 'field_'.$count,
-				'type'        => 'input',
-				'description' => NULL,
-				'default'     => NULL,
-				'settings'    => NULL
-			);
-	
-			$this->fields[$fieldset]->fields[$name] = $this->set_default_values($field, $default);
+			$this->fields[$fieldset]->fields[$name] = $this->set_default_values($field);
 		}
 	
 		public function get_fieldsets()
@@ -251,8 +228,24 @@ if(!class_exists('Interface_Builder'))
 			return $array;
 		}
 	
-		private function set_default_values($array, $default = array())
+		private function set_default_values($array, $default = FALSE)
 		{
+			if(!$default)
+			{
+				$count = count($this->fields) + 1;
+		
+				$default = array(
+					'title'       => NULL,
+					'id'          => 'fieldset_'.$count,
+					'legend' 	  => NULL,
+					'description' => NULL,
+					'details'     => NULL,
+					'fields'      => array(),
+					'attributes'  => array(),
+					'wrapper'	  => 'fieldset'
+				);
+			}
+			
 			$array = $this->convert_array($array);
 	
 			foreach($default as $index => $value)
@@ -294,8 +287,6 @@ if(!class_exists('Interface_Builder'))
 					
 			$this->EE           =& get_instance();
 			$this->channel_data =& $this->EE->channel_data;
-			
-			$this->EE->load->config('interface_builder');
 			
 			$var_name = $name;
 			

@@ -8,6 +8,8 @@ var InterfaceBuilder = function() {
 	
 	IB.matrix = function(obj) {
 	
+		console.log($(obj));
+		
 		$(obj).each(function() {
 			
 			var $wrapper = $(this);
@@ -19,11 +21,12 @@ var InterfaceBuilder = function() {
 			
 			$head.find('th').each(function(i) {
 				if(i > 0) {
-					columns.push($(this).data('column-name'));
+					columns.push($(this).data('col'));
 				}
 			});
 			
-			$wrapper.find(".ib-add-row").click(function() {		
+			$wrapper.find(".ib-add-row").live('click', function(e) {
+				
 				var row = $("<tr />");
 				var index = $body.find("tr").length;
 				
@@ -37,7 +40,7 @@ var InterfaceBuilder = function() {
 		
 				$body.append(row);
 		
-				return false;
+				e.preventDefault();
 			});
 			
 			$wrapper.find(".ib-delete-row").live('click', function() {		

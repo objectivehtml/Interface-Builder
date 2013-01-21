@@ -38,7 +38,8 @@ class Matrix_IBField extends IBFieldtype {
 				}
 			}
 			
-			$html[] = '<th data-column-name="'.$name.'">'.$column.'</th>';
+			
+			$html[] = '<th data-col="'.$name.'">'.$column.'</th>';
 		}
 
 		$html[] = '<th style="width:40px"></th>';	
