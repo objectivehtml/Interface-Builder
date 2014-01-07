@@ -1,0 +1,6 @@
+{
+    "name": "objectivehtml/interface-builder",
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
