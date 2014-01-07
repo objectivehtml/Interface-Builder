@@ -1,6 +1,9 @@
 {
     "name": "objectivehtml/interface-builder",
-   	"version": "1.0.0",
+    "version": {
+        "type": "1.0.0",
+        "description": "Package version, see http://getcomposer.org/doc/04-schema.md#version for more info on valid schemes."
+    },
    	"license": "MIT",
     "require": {
         "php": ">=5.3.0"
