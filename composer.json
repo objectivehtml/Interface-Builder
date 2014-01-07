@@ -1,7 +1,6 @@
 {
-    "name": "your-vendor-name/package-name",
+    "name": "objectivehtml/interface-builder",
     "require": {
-        "php": ">=5.3.0",
-        "another-vendor/package": "1.*"
+        "php": ">=5.3.0"
     }
 }
